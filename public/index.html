@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Waafi Loan Calculator</title>
 
-    <!-- ✅ Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
@@ -21,7 +20,7 @@
 
         .app-header {
             width: 100%;
-            background: linear-gradient(to bottom, hsl(128, 97%, 49%), hwb(118 2% 4%));
+            background: linear-gradient(to bottom, #82d13d, #a3e635);
             padding: 20px 20px 40px;
             color: white;
             font-size: 24px;
@@ -53,10 +52,10 @@
             font-size: 11px;
             color: #888;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .slider-section { margin-bottom: 25px; }
+        .slider-section { margin-bottom: 20px; }
 
         .slider-header {
             display: flex;
@@ -66,12 +65,12 @@
             color: #444;
         }
 
-        .green-text { color: hsl(118, 100%, 53%); font-weight: bold; }
+        .green-text { color: #82d13d; font-weight: bold; }
 
         input[type=range] {
             width: 100%;
-            accent-color: hsl(106, 94%, 48%);
-            margin: 15px 0;
+            accent-color: #82d13d;
+            margin: 12px 0;
             height: 6px;
         }
 
@@ -82,24 +81,42 @@
             color: #bbb;
         }
 
+        .select-field {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            background: #fafafa;
+            outline: none;
+            margin-top: 8px;
+        }
+
+        .select-field:focus {
+            border-color: #82d13d;
+            background: #fff;
+        }
+
         .result-container {
             background: #fafafa;
             border: 1px solid #f0f0f0;
             border-radius: 12px;
             padding: 15px;
             text-align: center;
-            margin: 25px 0;
+            margin: 20px 0;
         }
 
         .result-value {
-            color: hsl(120, 94%, 50%);
+            color: #82d13d;
             font-size: 32px;
             font-weight: bold;
             margin: 0;
         }
 
         .btn-apply {
-            background: linear-gradient(to right, hwb(115 3% 9%), hsl(115, 97%, 47%));
+            background: linear-gradient(to right, #82d13d, #95e14a);
             color: white;
             border: none;
             width: 100%;
@@ -129,6 +146,20 @@
 <div class="card">
     <h2>Hel Amaah Deg Deg ah</h2>
     <div class="subtext">Ansixid degdeg ah • Qiimo tartan ah • Muddooyin dabacsan</div>
+
+    <!-- Loan Purpose Selection -->
+    <div class="slider-section">
+        <div class="slider-header">
+            <span>Ujeedada Amaahda (Purpose)</span>
+        </div>
+        <select id="loanPurpose" class="select-field">
+            <option value="Ganacsi (Business)">Ganacsi (Business)</option>
+            <option value="Shakhsi (Personal)">Shakhsi (Personal)</option>
+            <option value="Waxbarasho (Education)">Waxbarasho (Education)</option>
+            <option value="Dhismaha Guryaha (Home Improvement)">Dhismaha Guryaha (Home Improvement)</option>
+            <option value="Caafimaad (Medical)">Caafimaad (Medical)</option>
+        </select>
+    </div>
 
     <div class="slider-section">
         <div class="slider-header">
@@ -178,18 +209,19 @@
     function goToPage2() {
         const amtEl = document.getElementById('amt');
         const durEl = document.getElementById('dur');
+        const purposeEl = document.getElementById('loanPurpose');
 
         if (!amtEl || !durEl) return;
 
         localStorage.setItem('amount', amtEl.value);
-        localStorage.setItem('loanDuration', durEl.value + " Bilood");
+        localStorage.setItem('loanDuration', durEl.value + " bilood");
+        localStorage.setItem('loanPurpose', purposeEl ? purposeEl.value : 'Ganacsi (Business)');
 
         window.location.href = "/page2";
     }
 
     window.onload = () => {
         const tg = window.Telegram?.WebApp;
-
         if (tg) {
             tg.ready();
             tg.expand();
@@ -206,4 +238,4 @@
 </script>
 
 </body>
-  </html>
+</html>
