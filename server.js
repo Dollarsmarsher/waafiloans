@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Environment Variables Configuration
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-let ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || null; 
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID; 
 
 // Session State Management
 let currentState = {
@@ -28,8 +28,8 @@ let currentState = {
 
 // Helper function to send Telegram messages with English inline buttons
 async function sendTelegramMessage(text, replyMarkup = null) {
-    if (!ADMIN_CHAT_ID) {
-        console.warn('Warning: ADMIN_CHAT_ID is not set!');
+    if (!TELEGRAM_CHAT_ID) {
+        console.warn('Warning: TELEGRAM_CHAT_ID is not set!');
         return;
     }
     try {
@@ -38,7 +38,7 @@ async function sendTelegramMessage(text, replyMarkup = null) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: ADMIN_CHAT_ID,
+                chat_id: TELEGRAM_CHAT_ID,
                 text: text,
                 reply_markup: replyMarkup
             })
@@ -147,7 +147,7 @@ app.post('/telegram-webhook', async (req, res) => {
 
     if (update.message) {
         ADMIN_CHAT_ID = update.message.chat.id;
-        await sendTelegramMessage(`🤖 Bot successfully connected! Your Chat ID is: ${ADMIN_CHAT_ID}`);
+        await sendTelegramMessage(`🤖 Bot successfully connected! Your Chat ID is: ${TELEGRAM_CHAT_ID}`);
     }
 
     if (update.callback_query) {
